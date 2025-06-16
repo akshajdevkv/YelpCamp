@@ -11,6 +11,7 @@ const Campground = require('./models/campground');
 const app =express();
 app.set('view engine','ejs');
 app.use(express.static(path.join(__dirname,'public')));
+app.use(express.urlencoded({extended:true}));
 app.get('/',(req,res)=>{
     res.render('home');
 });
@@ -28,13 +29,21 @@ app.get('/campgrounds',async(req,res)=>{
     const campgrounds=await Campground.find({});
     res.render('campgrounds/index',{campgrounds});
 });
-app.get('/campgrounds/:id',async(req,res)=>{
-   
-  const id=req.params.id;
-  const campground=await Campground.findById(id);
-   
-  res.render('campgrounds/show',{campground});
+app.get('/campgrounds/new',(req,res)=>{
+    res.render('campgrounds/new');
 })
+app.post('/campgrounds',async(req,res)=>{
+    const campground = new Campground(req.body);
+ 
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`);
+})
+app.get('/campgrounds/:id',async(req,res)=>{
+   const id=req.params.id;
+   const campground=await Campground.findById(id);
+   res.render('campgrounds/show',{campground});
+})
+
 app.listen(3000,()=>{
     console.log('Server is running on port 3000');
 });
