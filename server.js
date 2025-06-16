@@ -43,7 +43,16 @@ app.get('/campgrounds/:id',async(req,res)=>{
    const campground=await Campground.findById(id);
    res.render('campgrounds/show',{campground});
 })
-
+app.get('/campgrounds/:id/edit',async(req,res)=>{
+    const id=req.params.id;
+    const campground=await Campground.findById(id);
+    res.render('campgrounds/edit',{campground});
+})
+app.put('/campgrounds/:id',async(req,res)=>{
+    const id=req.params.id;
+    const campground=await Campground.findByIdAndUpdate(id,req.body);
+    res.redirect(`/campgrounds/${campground._id}`);
+})
 app.listen(3000,()=>{
     console.log('Server is running on port 3000');
 });
