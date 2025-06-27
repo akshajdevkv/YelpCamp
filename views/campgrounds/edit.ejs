@@ -2,7 +2,7 @@
 <div class="row">
     <h1 class="text-center">Edit Campground</h1>
     <div class="col-6 offset-3">
-        <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="post">
+        <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="post" >
             <label for="title" class="form-label">Title</label>
             <input type="text" name="title" id="campground[title]" class="form-control" value="<%= campground.title %>">
             <label for="location" class="form-label">Location</label>
