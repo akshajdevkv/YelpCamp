@@ -1,74 +1,114 @@
-const  express= require("express");
-const path= require("path");
-const methodOverride=require('method-override');
-const mongoose= require("mongoose");
-const ejsMate=require('ejs-mate');
-const catchAsync=require('./utils/catchAsync');
-const ExpressError=require('./utils/ExpressError');
+const express = require("express");
+const path = require("path");
+const methodOverride = require('method-override');
+const mongoose = require("mongoose");
+const ejsMate = require('ejs-mate');
+const catchAsync = require('./utils/catchAsync');
+const ExpressError = require('./utils/ExpressError');
+
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
-const db=mongoose.connection;
-db.on('error',console.error.bind(console,'connection error:'));
-db.once('open',()=>{
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
     console.log('Database connected');
 });
+
 const Campground = require('./models/campground');
-const app =express();
-app.set('view engine','ejs');
-app.use(express.static(path.join(__dirname,'public')));
-app.use(express.urlencoded({extended:true}));
+const app = express();
+
+app.engine('ejs', ejsMate);
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
-app.engine('ejs',ejsMate);
-app.get('/',(req,res)=>{
+app.use(express.static(path.join(__dirname, 'public')));
+
+const validateCampground = (req, res, next) => {
+    const { title, location, price } = req.body;
+    if (!title) throw new ExpressError('Campground title is required', 400);
+    if (!location) throw new ExpressError('Campground location is required', 400);
+    if (!price) throw new ExpressError('Campground price is required', 400);
+    if (price < 0) throw new ExpressError('Campground price must be positive', 400);
+    next();
+}
+
+app.get('/', (req, res) => {
     res.render('home');
 });
-app.get('/makecampground',async(req,res)=>{
-    const campground=new Campground({
-        name:'Campground 1',
-        price:100,
-        desciprtion:'This is a description of the campground',
-        location:'New York'
+
+app.get('/makecampground', async (req, res) => {
+    const campground = new Campground({
+        name: 'Campground 1',
+        price: 100,
+        desciprtion: 'This is a description of the campground',
+        location: 'New York'
     });
     await campground.save();
     res.send(campground);
 });
-app.get('/campgrounds',async(req,res)=>{
-    const campgrounds=await Campground.find({});
-    res.render('campgrounds/index',{campgrounds});
-});
-app.get('/campgrounds/new',(req,res)=>{
+
+app.get('/campgrounds', catchAsync(async (req, res) => {
+    const campgrounds = await Campground.find({});
+    res.render('campgrounds/index', { campgrounds });
+}));
+
+app.get('/campgrounds/new', (req, res) => {
     res.render('campgrounds/new');
-})
-app.post('/campgrounds', catchAsync(async(req,res,next)=>{
+});
+
+app.post('/campgrounds', validateCampground, catchAsync(async (req, res) => {
     const campground = new Campground(req.body);
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`);
-   
-}))
-app.get('/campgrounds/:id',async(req,res)=>{
-   const id=req.params.id;
-   const campground=await Campground.findById(id);
-   res.render('campgrounds/show',{campground});
-})
-app.get('/campgrounds/:id/edit',async(req,res)=>{
-    const id=req.params.id;
-    const campground=await Campground.findById(id);
-    res.render('campgrounds/edit',{campground});
-})
-app.put('/campgrounds/:id',async(req,res)=>{
-    const id=req.params.id;
-    console.log(req.body);
-    const campground=await Campground.findByIdAndUpdate(id,req.body);
+}));
+
+app.get('/campgrounds/:id', catchAsync(async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    if (!campground) {
+        throw new ExpressError('Campground not found', 404);
+    }
+    res.render('campgrounds/show', { campground });
+}));
+
+app.get('/campgrounds/:id/edit', catchAsync(async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    if (!campground) {
+        throw new ExpressError('Campground not found', 404);
+    }
+    res.render('campgrounds/edit', { campground });
+}));
+
+app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const campground = await Campground.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
+    if (!campground) {
+        throw new ExpressError('Campground not found', 404);
+    }
     res.redirect(`/campgrounds/${campground._id}`);
-})
-app.delete('/campgrounds/:id',async(req,res)=>{
-    const id=req.params.id;
-    await Campground.findByIdAndDelete(id);
+}));
+
+app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const campground = await Campground.findByIdAndDelete(id);
+    if (!campground) {
+        throw new ExpressError('Campground not found', 404);
+    }
     res.redirect('/campgrounds');
-})
-app.use((err,req,res,next)=>{
-    const {status=500,message='Something went wrong'}=err;
-    res.status(status).send(message);
-})
-app.listen(3000,()=>{
+}));
+
+// Handle 404s
+app.use((req, res, next) => {
+    next(new ExpressError('Page Not Found', 404));
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+    const { statusCode = 500 } = err;
+    if (!err.message) err.message = 'Oh No, Something Went Wrong!';
+    res.status(statusCode).render('error', { err });
+});
+
+app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
