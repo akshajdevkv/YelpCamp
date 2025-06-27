@@ -3,6 +3,8 @@ const path= require("path");
 const methodOverride=require('method-override');
 const mongoose= require("mongoose");
 const ejsMate=require('ejs-mate');
+const catchAsync=require('./utils/catchAsync');
+const ExpressError=require('./utils/ExpressError');
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
 const db=mongoose.connection;
 db.on('error',console.error.bind(console,'connection error:'));
@@ -36,12 +38,12 @@ app.get('/campgrounds',async(req,res)=>{
 app.get('/campgrounds/new',(req,res)=>{
     res.render('campgrounds/new');
 })
-app.post('/campgrounds',async(req,res)=>{
+app.post('/campgrounds', catchAsync(async(req,res,next)=>{
     const campground = new Campground(req.body);
- 
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`);
-})
+   
+}))
 app.get('/campgrounds/:id',async(req,res)=>{
    const id=req.params.id;
    const campground=await Campground.findById(id);
@@ -62,6 +64,10 @@ app.delete('/campgrounds/:id',async(req,res)=>{
     const id=req.params.id;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
+})
+app.use((err,req,res,next)=>{
+    const {status=500,message='Something went wrong'}=err;
+    res.status(status).send(message);
 })
 app.listen(3000,()=>{
     console.log('Server is running on port 3000');
