@@ -5,14 +5,15 @@ const mongoose = require("mongoose");
 const ejsMate = require('ejs-mate');
 const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError');
-
+const Joi = require('joi');
+const campgroundSchema = require('./schema');
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
     console.log('Database connected');
 });
-
+ 
 const Campground = require('./models/campground');
 const app = express();
 
@@ -25,14 +26,14 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const validateCampground = (req, res, next) => {
-    const { title, location, price } = req.body;
-    if (!title) throw new ExpressError('Campground title is required', 400);
-    if (!location) throw new ExpressError('Campground location is required', 400);
-    if (!price) throw new ExpressError('Campground price is required', 400);
-    if (price < 0) throw new ExpressError('Campground price must be positive', 400);
+    
+    const {error} = campgroundSchema.validate(req.body);
+    if (error) {
+        const message = error.details.map(el => el.message).join(',');
+        throw new ExpressError(message, 400);
+    }
     next();
 }
-
 app.get('/', (req, res) => {
     res.render('home');
 });
@@ -58,6 +59,7 @@ app.get('/campgrounds/new', (req, res) => {
 });
 
 app.post('/campgrounds', validateCampground, catchAsync(async (req, res) => {
+    
     const campground = new Campground(req.body);
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`);
