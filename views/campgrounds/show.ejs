@@ -1,6 +1,6 @@
 <%- layout('./layout/boilerplate') %>
-<div class="row mb-5" >
-    <div class="col-6 offset-3">
+<div class="row mb-5 mx-3" >
+    <div class="col-6">
         <div class="card" >
             <img src="<%= campground.image %>" class="card-img-top" alt="...">
             <div class="card-body">
@@ -10,7 +10,6 @@
             <ul class="list-group list-group-flush">
               <li class="list-group-item text-muted"><%= campground.location %></li>
               <li class="list-group-item">Price: <%= campground.price %></li>
- 
             </ul>
             <div class="card-body">
               <a href="/campgrounds/<%= campground._id %>/edit  " class="btn btn-warning">Edit</a>
@@ -19,35 +18,35 @@
               </form>
               <a href="/campgrounds" class="btn btn-secondary">Back to Campgrounds</a>
             </div>
-          </div>
-          <div class="row mt-5">
-            <h2>Leave a review</h2>
-          <form action="/campgrounds/<%= campground._id %>/reviews" method="post" class="validated-form" novalidate>
+        </div>
+    </div>
+    <div class="col-6">
+        <h2>Leave a review</h2>
+        <form action="/campgrounds/<%= campground._id %>/reviews" method="post" class="validated-form" novalidate>
             <div class="mb-3">
-              <label for="rating" class="form-label">Rating</label>
-              <input type="range" class="form-range" id="rating" name="review[rating]" min="1" max="5" step="1" required>
+                <label for="rating" class="form-label">Rating</label>
+                <input type="range" class="form-range" id="rating" name="review[rating]" min="1" max="5" step="1" required>
             </div>
             <div class="mb-5 p-3 bg-light">
-              <label for="body" class="form-label">Review</label>
-              <textarea name="review[body]" id="body" class="form-control" cols="30" rows="3" required></textarea>
-              <div class="valid-feedback">
-                Looks perfect!
-              </div>
+                <label for="body" class="form-label">Review</label>
+                <textarea name="review[body]" id="body" class="form-control" cols="30" rows="3" required></textarea>
+                <div class="valid-feedback">
+                    Looks perfect!
+                </div>
             </div>
             <button type="submit" class="btn btn-success">Submit Review</button>
-          </form>
-          <% for(let review of campground.reviews) { %>
+        </form>
+        <% for(let review of campground.reviews) { %>
             <div class="card mb-3 mt-3">
-              <div class="card-body">
-                <h5 class="card-title">Rating: 
-                  <% for(let i = 1; i <= 5; i++) { %>
-                    <span class="text-<%= i <= review.rating ? 'warning' : 'secondary' %>">★</span>
-                  <% } %>
-                </h5>
-                <p class="card-text">Review: <%= review.body %></p>
-              </div>
+                <div class="card-body">
+                    <h5 class="card-title">Rating: 
+                        <% for(let i = 1; i <= 5; i++) { %>
+                            <span class="text-<%= i <= review.rating ? 'warning' : 'secondary' %>">★</span>
+                        <% } %>
+                    </h5>
+                    <p class="card-text">Review: <%= review.body %></p>
+                </div>
             </div>
-          <% } %>
-          </div>
+        <% } %>
     </div>
-</div> 
+</div>
