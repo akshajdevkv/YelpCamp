@@ -91,10 +91,11 @@ app.post("/campgrounds/:id/reviews", validateReview, catchAsync(async(req, res) 
 }));
 
 app.get('/campgrounds/:id', catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
+    const campground = await Campground.findById(req.params.id).populate('reviews');
     if (!campground) {
         throw new ExpressError('Campground not found', 404);
     }
+    console.log(campground);
     res.render('campgrounds/show', { campground });
 }));
 

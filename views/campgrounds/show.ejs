@@ -36,6 +36,18 @@
             </div>
             <button type="submit" class="btn btn-success">Submit Review</button>
           </form>
+          <% for(let review of campground.reviews) { %>
+            <div class="card mb-3 mt-3">
+              <div class="card-body">
+                <h5 class="card-title">Rating: 
+                  <% for(let i = 1; i <= 5; i++) { %>
+                    <span class="text-<%= i <= review.rating ? 'warning' : 'secondary' %>">★</span>
+                  <% } %>
+                </h5>
+                <p class="card-text">Review: <%= review.body %></p>
+              </div>
+            </div>
+          <% } %>
           </div>
     </div>
 </div> 
