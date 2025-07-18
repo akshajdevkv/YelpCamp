@@ -22,7 +22,13 @@ const CampgroundSchema = new Schema({
     location: {
         type: String,
         required: [true, 'Location cannot be empty']
-    }
+    },
+    reviews: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Review'
+        }
+    ]
 });
 
 const Campground = mongoose.model('Campground', CampgroundSchema);
