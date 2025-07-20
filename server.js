@@ -7,7 +7,8 @@ const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError');
 const Joi = require('joi');
 const campgroundsRoutes = require('./routes/campgrounds');
-const {reviewSchema} = require('./schema');
+const reviewsRoutes = require('./routes/reviews');
+const {reviewSchema} = require('./schemas');
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
 const db = mongoose.connection;
@@ -30,53 +31,13 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-const validateReview = (req, res, next) => {
-    const {error} = reviewSchema.validate(req.body);
-    if (error) {
-        const message = error.details.map(el => el.message).join(',');
-        throw new ExpressError(message, 400);
-    }
-    next();
-}
-
+app.use('/campgrounds/:id/reviews', reviewsRoutes);
 app.use('/campgrounds', campgroundsRoutes);
 app.get('/', (req, res) => {
     res.render('home');
 });
 
-app.get('/makecampground', async (req, res) => {
-    const campground = new Campground({
-        name: 'Campground 1',
-        price: 100,
-        desciprtion: 'This is a description of the campground',
-        location: 'New York'
-    });
-    await campground.save();
-    res.send(campground);
-});
-
-
-app.post("/campgrounds/:id/reviews", validateReview, catchAsync(async(req, res) => {
-    const campground = await Campground.findById(req.params.id);
-    if (!campground) {
-        throw new ExpressError('Campground not found', 404);
-    }
-    const review = new Review({
-        body: req.body.review.body,
-        rating: parseInt(req.body.review.rating)
-    });
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`);
-}));
-
-app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async (req, res) => {
-    const { id, reviewId } = req.params;
-    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrounds/${id}`);
-}));
+ 
 
 
 
