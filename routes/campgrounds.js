@@ -53,7 +53,9 @@ router.put('/:id', validateCampground, catchAsync(async (req, res) => {
     const campground = await Campground.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
     if (!campground) {
         throw new ExpressError('Campground not found', 404);
+        req.flash('error', 'Campground not found');
     }
+    req.flash('success', 'Successfully updated campground!');
     res.redirect(`/campgrounds/${campground._id}`);
 }));
 router.delete('/:id', catchAsync(async (req, res) => {
@@ -61,7 +63,9 @@ router.delete('/:id', catchAsync(async (req, res) => {
     const campground = await Campground.findByIdAndDelete(id);
     if (!campground) {
         throw new ExpressError('Campground not found', 404);
+        req.flash('error', 'Campground not found');
     }
+    req.flash('success', 'Successfully deleted campground!');
     res.redirect('/campgrounds');
 }));
 
