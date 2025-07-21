@@ -9,6 +9,8 @@ const Joi = require('joi');
 const campgroundsRoutes = require('./routes/campgrounds');
 const reviewsRoutes = require('./routes/reviews');
 const {reviewSchema} = require('./schemas');
+const session = require('express-session');
+
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
 const db = mongoose.connection;
@@ -29,6 +31,16 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+    secret: 'thisshouldbeabettersecret!',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + (1000 * 60 * 60 * 24 * 30),
+        maxAge: 1000 * 60 * 60 * 24 * 30
+    }
+}));
 
 
 app.use('/campgrounds/:id/reviews', reviewsRoutes);
