@@ -34,7 +34,9 @@ router.post('/', validateCampground, catchAsync(async (req, res) => {
 router.get('/:id', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id).populate('reviews');
     if (!campground) {
-        throw new ExpressError('Campground not found', 404);
+        //throw new ExpressError('Campground not found', 404);
+        req.flash('error', 'Campground not found');
+        return res.redirect('/campgrounds');
     }
     console.log(campground);
     res.render('campgrounds/show', { campground });
@@ -43,7 +45,9 @@ router.get('/:id', catchAsync(async (req, res) => {
 router.get('/:id/edit', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     if (!campground) {
-        throw new ExpressError('Campground not found', 404);
+        //throw new ExpressError('Campground not found', 404);
+        req.flash('error', 'Campground not found');
+        return res.redirect('/campgrounds');
     }
     res.render('campgrounds/edit', { campground });
 }));
@@ -52,7 +56,7 @@ router.put('/:id', validateCampground, catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
     if (!campground) {
-        throw new ExpressError('Campground not found', 404);
+        //throw new ExpressError('Campground not found', 404);
         req.flash('error', 'Campground not found');
     }
     req.flash('success', 'Successfully updated campground!');
@@ -62,8 +66,9 @@ router.delete('/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findByIdAndDelete(id);
     if (!campground) {
-        throw new ExpressError('Campground not found', 404);
+        //  throw new ExpressError('Campground not found', 404);
         req.flash('error', 'Campground not found');
+        return res.redirect('/campgrounds');
     }
     req.flash('success', 'Successfully deleted campground!');
     res.redirect('/campgrounds');
