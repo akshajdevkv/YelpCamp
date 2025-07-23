@@ -29,8 +29,22 @@
             <h2>Leave a review</h2>
             <form action="/campgrounds/<%= campground._id %>/reviews" method="post" class="validated-form" novalidate>
                 <div class="mb-3">
-                    <label for="rating" class="form-label">Rating</label>
-                    <input type="range" class="form-range" id="rating" name="review[rating]" min="1" max="5" step="1" required>
+                    <fieldset class="starability-basic">
+                        <legend>Rating: <span class="text-danger">*</span></legend>
+                        <input type="radio" id="first-rate1" name="review[rating]" value="1" required />
+                        <label for="first-rate1" title="Terrible">1 star</label>
+                        <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                        <label for="first-rate2" title="Not good">2 stars</label>
+                        <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                        <label for="first-rate3" title="Average">3 stars</label>
+                        <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                        <label for="first-rate4" title="Very good">4 stars</label>
+                        <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                        <label for="first-rate5" title="Amazing">5 stars</label>
+                    </fieldset>
+                    <div class="invalid-feedback">
+                        Please select a rating
+                    </div>
                 </div>
                 <div class="mb-5 p-3 bg-light">
                     <label for="body" class="form-label">Review</label>
@@ -45,7 +59,6 @@
         <% for(let review of campground.reviews) { %>
             <div class="card mb-3 mt-3">
                 <div class="card-body">
-                    <h5>Rated <%= review.rating %> stars</h5>
                     <p class="starability-result" data-rating="<%= review.rating %>">
                       Rated: <%= review.rating %> stars
                     </p> 
