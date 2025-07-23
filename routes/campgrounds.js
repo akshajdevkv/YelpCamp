@@ -28,7 +28,7 @@ router.get('/new',isLoggedIn,(req,res)=>{
 
 // Create route
 router.post('/',isLoggedIn, validateCampground, catchAsync(async (req, res) => {
-    const campground = new Campground(req.body);
+    const campground = new Campground(req.body.campground);
     campground.author = req.user._id;
     await campground.save();
     req.flash('success', 'Successfully made a new campground!');
@@ -59,7 +59,7 @@ router.get('/:id/edit',isLoggedIn, catchAsync(async (req, res) => {
 // Update route
 router.put('/:id',isLoggedIn, validateCampground, catchAsync(async (req, res) => {
     const { id } = req.params;
-    const campground = await Campground.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
+    const campground = await Campground.findByIdAndUpdate(id, req.body.campground, { runValidators: true, new: true });
     if (!campground) {
         req.flash('error', 'Campground not found');
         return res.redirect('/campgrounds');
