@@ -4,16 +4,17 @@ const catchAsync = require('../utils/catchAsync');
 const ExpressError = require('../utils/ExpressError');
 const Campground = require('../models/campground');
 const Review = require('../models/review');
-    const { validateReview } = require('../middleware');
+    const { validateReview, isLoggedIn, isAuthor } = require('../middleware');
 
-router.post("/", validateReview, catchAsync(async(req, res) => {
+router.post("/", validateReview, isLoggedIn, catchAsync(async(req, res) => {
     const campground = await Campground.findById(req.params.id);
     if (!campground) {
         throw new ExpressError('Campground not found', 404);
     }
     const review = new Review({
         body: req.body.review.body,
-        rating: parseInt(req.body.review.rating)
+        rating: parseInt(req.body.review.rating),
+        author: req.user._id
     });
     campground.reviews.push(review);
     await review.save();
@@ -22,7 +23,7 @@ router.post("/", validateReview, catchAsync(async(req, res) => {
     res.redirect(`/campgrounds/${campground._id}`);
 }));
 
-router.delete('/:reviewId', catchAsync(async (req, res) => {
+router.delete('/:reviewId', isLoggedIn, isAuthor, catchAsync(async (req, res) => {
     const { id, reviewId } = req.params;
     await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
     await Review.findByIdAndDelete(reviewId);
