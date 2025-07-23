@@ -10,6 +10,7 @@
             <ul class="list-group list-group-flush">
               <li class="list-group-item text-muted"><%= campground.location %></li>
               <li class="list-group-item">Price: <%= campground.price %></li>
+              <li class="list-group-item">Author: <%= campground.author.username %></li>
             </ul>
             <div class="card-body">
               <% if(currentUser && campground.author.equals(currentUser._id)) { %>
