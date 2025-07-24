@@ -24,10 +24,7 @@ const User = require('./models/user');
 const userRoutes = require('./routes/users');
  
 
-mongoose.connect(dbURL,{
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+mongoose.connect(dbURL);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
