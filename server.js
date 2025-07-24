@@ -3,8 +3,10 @@ if(process.env.NODE_ENV !== 'production') {
 }
 
 const express = require("express");
- 
+const dbURL= process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
 const path = require("path");
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const methodOverride = require('method-override');
 const mongoose = require("mongoose");
 const ejsMate = require('ejs-mate');
@@ -14,7 +16,7 @@ const Joi = require('joi');
 const campgroundsRoutes = require('./routes/campgrounds');
 const reviewsRoutes = require('./routes/reviews');
 const {reviewSchema} = require('./schemas');
-const session = require('express-session');
+ 
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -22,7 +24,10 @@ const User = require('./models/user');
 const userRoutes = require('./routes/users');
  
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp');
+mongoose.connect(dbURL,{
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
@@ -42,9 +47,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Security Middleware
- 
+const store = MongoStore.create({
+    mongoUrl: dbURL,
+    secret: 'thisshouldbeabettersecret!',
+    touchAfter: 24 * 60 * 60
+});
+
+store.on('error', function(e) {
+    console.log('SESSION STORE ERROR', e);
+});
+
 const sessionConfig = {
+    store,
     secret: 'thisshouldbeabettersecret!',
     resave: false,
     saveUninitialized: true,
@@ -69,13 +83,9 @@ app.use((req, res, next) => {
     res.locals.error = req.flash('error');
     next();
 });
+ 
 
-app.get('/fakeUser', async (req, res) => {
-    const user = new User({email: 'coltttt@gmail.com', username: 'coltttt'});
-    const newUser = await User.register(user, 'chicken');
-    res.send(newUser);
-});
-
+ 
 app.use('/campgrounds/:id/reviews', reviewsRoutes);
 app.use('/campgrounds', campgroundsRoutes);
 app.use('/users', userRoutes);
