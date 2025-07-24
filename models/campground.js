@@ -2,6 +2,20 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Review = require('./review');
 
+const ImageSchema = new Schema({
+    url: String,
+    filename: String
+});  
+ImageSchema.virtual('thumbnail').get(function() {
+    if (this.url.includes('/upload')) {
+        // Cloudinary image
+        return this.url.replace('/upload', '/upload/w_200');
+    } else {
+        // Picsum image
+        return this.url.replace('picsum.photos/600/400', 'picsum.photos/200/100');
+    }
+});
+
 const CampgroundSchema = new Schema({
     title: {
         type: String,
@@ -16,12 +30,7 @@ const CampgroundSchema = new Schema({
         type: String,
         required: [true, 'Description cannot be empty']
     },
-    images: [
-        {
-            url:String,
-            filename:String,
-        }
-    ],
+    images: [ImageSchema],
     location: {
         type: String,
         required: [true, 'Location cannot be empty']
