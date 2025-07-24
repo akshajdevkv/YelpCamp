@@ -16,10 +16,12 @@ const CampgroundSchema = new Schema({
         type: String,
         required: [true, 'Description cannot be empty']
     },
-    image: {
-        type: String,
-        required: [true, 'Image URL cannot be empty']
-    },
+    image: [
+        {
+            url:String,
+            filename:String,
+        }
+    ],
     location: {
         type: String,
         required: [true, 'Location cannot be empty']
