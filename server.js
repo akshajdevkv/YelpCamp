@@ -4,6 +4,7 @@ if(process.env.NODE_ENV !== 'production') {
 }
 
 const express = require("express");
+const mongoSanitize = require('express-mongo-sanitize');
 const path = require("path");
 const methodOverride = require('method-override');
 const mongoose = require("mongoose");
@@ -39,6 +40,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+
 const sessionConfig = {
     secret: 'thisshouldbeabettersecret!',
     resave: false,
@@ -63,6 +65,7 @@ app.use((req, res, next) => {
     res.locals.error = req.flash('error');
     next();
 });
+app.use(mongoSanitize());
 app.get('/fakeUser', async (req, res) => {
     const user = new User({email: 'coltttt@gmail.com', username: 'coltttt'});
     const newUser = await User.register(user, 'chicken');
