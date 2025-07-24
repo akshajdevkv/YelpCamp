@@ -2,7 +2,7 @@
 <div class="row">
     <h1 class="text-center">Edit Campground</h1>
     <div class="col-6 offset-3">
-        <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="post" novalidate class="validated-form">  
+        <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="post" novalidate class="validated-form" enctype="multipart/form-data">  
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
                 <input type="text" name="campground[title]" id="title" class="form-control" value="<%= campground.title %>" required>
@@ -23,16 +23,7 @@
                     Looks good
                 </div>
             </div>
-            <div class="mb-3">
-                <label for="image" class="form-label">Add Images</label>
-                <input type="file" name="image" id="image" class="form-control" value="<%= campground.image %>" required multiple   enctype="multipart/form-data">
-                <div class="invalid-feedback">
-                    Image URL is required
-                </div>
-                <div class="valid-feedback">
-                    Looks good
-                </div>
-            </div>
+           
             <div class="mb-3">
                 <label for="price" class="form-label">Campground Price</label>
                 <div class="input-group">
@@ -55,6 +46,22 @@
                 <div class="valid-feedback">
                     Looks good
                 </div>
+            </div>
+            <div class="mb-3">
+                <label for="formFileMultiple" class="form-label">Add Images</label>
+                <input class="form-control" type="file" id="formFileMultiple" name="image" accept="image/*" multiple <%= campground.images.length === 0 ? 'required' : '' %>>
+                <div class="invalid-feedback">
+                    Please upload at least one image
+                </div>
+            </div>
+            <div class="mb-3">
+                <% campground.images.forEach((img,i) => { %>
+                    <img src="<%= img.url %>" alt="<%= img.filename %>" class="img-fluid">
+                    <div class="form-check-inline">
+                        <input class="form-check-input" type="checkbox"  id="image-<%= i %>" name="deleteImages[]" value="<%= img.filename %>">
+                        <label class="form-check-label" for="image-<%= i %>">Delete</label>
+                    </div>
+                <% }) %>
             </div>
             <div class="mb-3">
                 <button type="submit" class="btn btn-success">Submit</button>

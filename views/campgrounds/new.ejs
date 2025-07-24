@@ -17,13 +17,7 @@
                     Location is required
                 </div>
             </div>
-            <div class="mb-3">
-                <label for="image" class="form-label">Upload Images</label>
-                <input type="file" name="image" id="image" accept="image/*" class="form-control" multiple required>
-                <div class="invalid-feedback">
-                    Please upload at least one image
-                </div>
-            </div>
+            
             <div class="mb-3">
                 <label for="price" class="form-label">Campground Price</label>
                 <div class="input-group">
@@ -39,6 +33,15 @@
                 <textarea name="campground[description]" id="description" class="form-control" required></textarea>
                 <div class="invalid-feedback">
                     Description is required
+                </div>
+            </div>
+            <div class="mb-3">
+                    <div class="mb-3">
+                        <label for="formFileMultiple" class="form-label">Add Images</label>
+                        <input class="form-control" type="file" id="formFileMultiple" name="image" accept="image/*" multiple required>
+                </div>
+                <div class="invalid-feedback">
+                    Please upload at least one image
                 </div>
             </div>
             <div class="mb-3">
