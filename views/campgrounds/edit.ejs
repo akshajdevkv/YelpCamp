@@ -24,8 +24,8 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label for="image" class="form-label">Image URL</label>
-                <input type="text" name="campground[image]" id="image" class="form-control" value="<%= campground.image %>" required>
+                <label for="image" class="form-label">Add Images</label>
+                <input type="file" name="image" id="image" class="form-control" value="<%= campground.image %>" required multiple   enctype="multipart/form-data">
                 <div class="invalid-feedback">
                     Image URL is required
                 </div>
