@@ -17,7 +17,16 @@ const seedcampground=async()=>{
             author:'687fd34f7fc36e120d8a558b',
             location:`${cities[random1000].city}, ${cities[random1000].state}`,
             title: `${sample(descriptors)} ${sample(places)}`,
-            image: `https://picsum.photos/600/400?random=${Math.random()}`,
+            images: [
+                {
+                    url: `https://picsum.photos/600/400?random=${Math.random()}`,
+                    filename: `YelpCamp/random[${random1000}]`
+                },
+                {
+                    url: `https://picsum.photos/600/400?random=${Math.random()}`,
+                    filename: `YelpCamp/random[${random1000}]`
+                }
+            ],
             description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
             price: Math.floor(Math.random()*20)+10
            
