@@ -31,6 +31,10 @@ const CampgroundSchema = new Schema({
         required: [true, 'Description cannot be empty']
     },
     images: [ImageSchema],
+    location: {
+        type: String,
+        required: [true, 'Location cannot be empty']
+    },
     geometry: {
         type: {
           type: String, // Don't do `{ location: { type: String } }`
