@@ -13,8 +13,12 @@ module.exports.renderNewForm = (req, res) => {
 
 module.exports.createCampground = async (req, res) => {
     const geoData = await maptilerClient.geocoding.forward(req.body.campground.location, { limit: 1 });
-const campground = new Campground(req.body.campground);
-campground.geometry = geoData.features[0].geometry;
+const campground = new Campground(req.body.campground); 
+const defaultGeometry = {
+    type: 'Point',
+    coordinates: [0, 0]
+};
+campground.geometry = geoData.features.length ? geoData.features[0].geometry : defaultGeometry;
 
  
     campground.author = req.user._id;
